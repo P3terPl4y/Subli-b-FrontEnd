@@ -80,3 +80,21 @@ export async function apiFetch<T>(path: string, options: RequestInit = {}): Prom
   }
   return data as T;
 }
+
+// Solo disponible en desarrollo. Crea una sesión falsa para probar
+// el flujo sin backend. En producción el botón que la llama no se muestra.
+declare const __DEV__: boolean;
+
+export async function loginDebug(): Promise<void> {
+  if (!__DEV__) throw new Error('Solo disponible en desarrollo');
+  await storage.set(TOKEN_KEY, 'debug-token');
+  await storage.set(
+    USER_KEY,
+    JSON.stringify({
+      id: 'debug',
+      name: 'Invitado Debug',
+      email: 'debug@local',
+      role: 'debug',
+    })
+  );
+}

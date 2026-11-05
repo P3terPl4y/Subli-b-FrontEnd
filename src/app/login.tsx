@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { login as apiLogin } from '../lib/api';
+import { login as apiLogin, loginDebug } from '../lib/api';
 import {
   ActivityIndicator,
   KeyboardAvoidingView,
@@ -21,7 +21,7 @@ import {
   Barlow_700Bold,
   useFonts,
 } from '@expo-google-fonts/barlow';
-import { COLORES, styles } from './login.styles';
+import { COLORES, styles } from '../styles/login.styles';
 
 // Credenciales de demostración
 const DEMO = {
@@ -82,6 +82,16 @@ export default function LoginScreen() {
       setPassword('');
     } finally {
       setCargando(false);
+    }
+  };
+
+  // Solo en desarrollo: crea una sesion falsa y va al home
+  const entrarDebug = async () => {
+    try {
+      await loginDebug();
+      router.replace('/home');
+    } catch (e: any) {
+      setMensaje({ tipo: 'error', texto: e.message });
     }
   };
 
@@ -244,7 +254,18 @@ export default function LoginScreen() {
               </Text>
             </View>
 
+
+            {/* Solo aparece en desarrollo. En produccion __DEV__ es false y no se renderiza */}
+            {__DEV__ && (
+              <Pressable onPress={entrarDebug} style={{ marginTop: 14, alignItems: 'center' }}>
+                <Text style={{ color: '#aaa9ad', fontSize: 12, textDecorationLine: 'underline' }}>
+                  Entrar sin contraseña (modo debug)
+                </Text>
+              </Pressable>
+            )}
+
             <Text style={styles.pie}>
+
               ¿Aún no tienes cuenta?{' '}
               <Text style={styles.pieEnlace}>Solicita acceso</Text>
             </Text>

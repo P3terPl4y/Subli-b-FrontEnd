@@ -1,11 +1,10 @@
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
+import { CartProvider } from '../context/CartContext';
 
-// Layout raíz: solo define el Stack de navegación y el tema oscuro.
-// No usa tabs ni depende de componentes del template.
 export default function RootLayout() {
   return (
-    <>
+    <CartProvider>
       <StatusBar style="light" />
       <Stack
         screenOptions={{
@@ -15,8 +14,10 @@ export default function RootLayout() {
       >
         <Stack.Screen name="index" />
         <Stack.Screen name="login" />
-        <Stack.Screen name="panel" />
+        <Stack.Screen name="home" />
+        <Stack.Screen name="carrito" />
+        <Stack.Screen name="editor3d" />
       </Stack>
-    </>
+    </CartProvider>
   );
 }

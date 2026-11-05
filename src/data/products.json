@@ -1,0 +1,10 @@
+[
+  { "id": 1, "name": "Taza sublimada", "description": "Taza cerámica 11oz con diseño personalizado", "price": 8.5, "image": "https://picsum.photos/seed/taza/400", "badge": "nuevo" },
+  { "id": 2, "name": "Franela personalizada", "description": "Franela 100% algodón, sublimación full color", "price": 15, "image": "https://picsum.photos/seed/franela/400", "badge": "oferta" },
+  { "id": 3, "name": "Mousepad XL", "description": "Mousepad extendido 80x30cm con bordes cosidos", "price": 12, "image": "https://picsum.photos/seed/mousepad/400" },
+  { "id": 4, "name": "Gorra bordada", "description": "Gorra con logo bordado a todo color", "price": 10, "image": "https://picsum.photos/seed/gorra/400" },
+  { "id": 5, "name": "Termo 500ml", "description": "Termo de acero inoxidable con grabado láser", "price": 18, "image": "https://picsum.photos/seed/termo/400", "badge": "nuevo" },
+  { "id": 6, "name": "Llavero acrílico", "description": "Llavero personalizado con foto o logo", "price": 3.5, "image": "https://picsum.photos/seed/llavero/400" },
+  { "id": 7, "name": "Cojín 40x40", "description": "Funda de cojín sublimada, relleno incluido", "price": 14, "image": "https://picsum.photos/seed/cojin/400", "badge": "oferta" },
+  { "id": 8, "name": "Delantal", "description": "Delantal de poliéster con diseño full color", "price": 16, "image": "https://picsum.photos/seed/delantal/400" }
+]
