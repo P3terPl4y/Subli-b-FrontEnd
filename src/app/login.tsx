@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { login as apiLogin } from '../lib/api';
 import {
   ActivityIndicator,
   KeyboardAvoidingView,
@@ -58,44 +59,30 @@ export default function LoginScreen() {
   }
 
   // Valida los campos y simula la autenticación
-  const enviar = () => {
+  const enviar = async () => {
     setMensaje({ tipo: null, texto: '' });
-
     const mail = email.trim();
-
+  
     if (!mail || !password) {
       setMensaje({ tipo: 'error', texto: 'Completa correo y contraseña.' });
       return;
     }
-
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(mail)) {
       setMensaje({ tipo: 'error', texto: 'El correo no tiene un formato válido.' });
       return;
     }
-
+  
     setCargando(true);
-
-    setTimeout(() => {
-      if (mail.toLowerCase() === DEMO.email && password === DEMO.password) {
-        setMensaje({
-          tipo: 'exito',
-          texto: 'Acceso concedido. Redirigiendo al panel...',
-        });
-        setCargando(false);
-
-        // Navega al panel y reemplaza la ruta actual para que
-        // el usuario no pueda volver al login con el boton atras
-        router.replace('/panel');
-        return;
-      }
-
-      setMensaje({
-        tipo: 'error',
-        texto: 'Credenciales incorrectas. Verifica tus datos.',
-      });
+    try {
+      await apiLogin(mail, password);
+      setMensaje({ tipo: 'exito', texto: 'Acceso concedido. Redirigiendo...' });
+      router.replace('/home');
+    } catch (e: any) {
+      setMensaje({ tipo: 'error', texto: e.message || 'No se pudo iniciar sesión' });
       setPassword('');
+    } finally {
       setCargando(false);
-    }, 900);
+    }
   };
 
   return (
