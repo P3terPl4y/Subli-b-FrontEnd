@@ -25,7 +25,7 @@ export const styles = StyleSheet.create({
     borderColor: COLORES.borde,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 6 },
-    shadowOpacity: 0.35,
+    shadowOpacity: 0.28,
     shadowRadius: 10,
     elevation: 4,
   },

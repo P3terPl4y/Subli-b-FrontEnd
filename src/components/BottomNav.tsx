@@ -1,8 +1,10 @@
 import { Pressable, Text, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { usePathname, useRouter } from 'expo-router';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useCart } from '../context/CartContext';
-import { COLORES, styles } from '../styles/bottomNav.styles';
+import { useTheme } from '../context/ThemeContext';
+import { styles } from '../styles/bottomNav.styles';
 
 type Tab = {
   path: '/home' | '/carrito' | '/editor3d';
@@ -21,38 +23,93 @@ export default function BottomNav() {
   const router = useRouter();
   const pathname = usePathname();
   const { count } = useCart();
+  const { colors, mode } = useTheme();
+  // Espacio reservado por la barra del sistema (gestos o botones)
+  const insets = useSafeAreaInsets();
 
-  // Evita un replace sobre la misma ruta (parpadeo innecesario)
   const go = (path: Tab['path']) => {
     if (pathname !== path) router.replace(path);
   };
 
   return (
-    <View style={styles.contenedor}>
+    <View
+      style={[
+        styles.contenedor,
+        {
+          backgroundColor: colors.background,
+          borderTopColor: colors.border,
+          // La nav de la app queda por encima de la del telefono:
+          // se respeta la zona segura inferior con un minimo estetico
+          paddingBottom: Math.max(insets.bottom, 10),
+          // Sombra superior para separar visualmente del contenido
+          shadowColor: '#000',
+          shadowOffset: { width: 0, height: -4 },
+          shadowOpacity: mode === 'dark' ? 0.5 : 0.12,
+          shadowRadius: 10,
+          elevation: 12,
+        },
+      ]}
+    >
       {TABS.map((tab) => {
         const activo = pathname === tab.path;
         return (
           <Pressable
             key={tab.path}
             onPress={() => go(tab.path)}
-            style={({ pressed }) => [styles.item, pressed && { opacity: 0.7 }]}
+            android_ripple={{ color: colors.primary + '33', borderless: true }}
+            style={({ pressed }) => [
+              styles.item,
+              pressed && { transform: [{ scale: 0.94 }], opacity: 0.85 },
+            ]}
           >
             <View style={styles.iconoContenedor}>
               <Ionicons
                 name={activo ? tab.iconActive : tab.icon}
                 size={22}
-                color={activo ? COLORES.amarillo : COLORES.suave}
+                color={activo ? colors.primary : colors.textMuted}
               />
-              {/* Contador solo en la pestaña del carrito */}
               {tab.path === '/carrito' && count > 0 && (
-                <View style={styles.badge}>
-                  <Text style={styles.badgeTexto}>{count}</Text>
+                <View
+                  style={[
+                    styles.badge,
+                    {
+                      backgroundColor: colors.primary,
+                      shadowColor: colors.primary,
+                      shadowOpacity: 0.6,
+                      shadowRadius: 6,
+                      elevation: 4,
+                    },
+                  ]}
+                >
+                  <Text style={[styles.badgeTexto, { color: colors.background }]}>
+                    {count}
+                  </Text>
                 </View>
               )}
             </View>
-            <Text style={[styles.label, activo && styles.labelActivo]}>
+            <Text
+              style={[
+                styles.label,
+                { color: activo ? colors.primary : colors.textMuted },
+                activo && styles.labelActivo,
+              ]}
+            >
               {tab.label}
             </Text>
+
+            {/* Indicador inferior del tab activo */}
+            {activo && (
+              <View
+                style={{
+                  position: 'absolute',
+                  bottom: 0,
+                  width: 24,
+                  height: 3,
+                  borderRadius: 2,
+                  backgroundColor: colors.primary,
+                }}
+              />
+            )}
           </Pressable>
         );
       })}

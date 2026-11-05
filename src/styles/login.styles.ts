@@ -23,6 +23,12 @@ export const COLORES = {
 };
 
 export const styles = StyleSheet.create({
+  logoImagen: {
+    width: 38,
+    height: 38,
+    borderRadius: 10,
+    marginRight: 12,
+  },
   pantallaCarga: {
     flex: 1,
     backgroundColor: COLORES.fondo,

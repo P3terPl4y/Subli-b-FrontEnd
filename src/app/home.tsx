@@ -2,56 +2,73 @@ import { useEffect, useState } from 'react';
 import {
   ActivityIndicator,
   FlatList,
+  LayoutAnimation,
+  Platform,
   Text,
+  UIManager,
   useWindowDimensions,
   View,
 } from 'react-native';
+import { useRouter } from 'expo-router';
+import { useSwipeNavigation } from '../hooks/useSwipeNavigation';
 import { apiFetch } from '../lib/api';
 import { COLORES, styles } from '../styles/home.styles';
 import ProductCard from '../components/ProductCard';
 import AppHeader from '../components/AppHeader';
 import BottomNav from '../components/BottomNav';
 import { useGuardedCart } from '../hooks/useGuardedCart';
+import { useTheme } from '../context/ThemeContext';
+import { useProducts } from '../context/ProductsContext';
 import type { Product } from '../lib/types';
-import productsMock from '../data/products.json';
 
 const USE_MOCK = process.env.EXPO_PUBLIC_USE_MOCK === 'true';
 const BREAKPOINT = 700;
 
+// En Android hay que habilitar LayoutAnimation manualmente
+if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
+  UIManager.setLayoutAnimationEnabledExperimental(true);
+}
+
 export default function HomeScreen() {
+  const swipeHandlers = useSwipeNavigation();
+  const router = useRouter();
   const { tryAdd } = useGuardedCart();
+  const { colors } = useTheme();
+  const { products: localProducts, loading } = useProducts();
   const { width } = useWindowDimensions();
   const numColumns = width >= BREAKPOINT ? 4 : 2;
 
-  const [products, setProducts] = useState<Product[]>([]);
-  const [cargando, setCargando] = useState(true);
+  const [backendProducts, setBackendProducts] = useState<Product[]>([]);
+  const [cargandoBackend, setCargandoBackend] = useState(!USE_MOCK);
   const [error, setError] = useState<string | null>(null);
 
+  // En modo real (no mock), carga los productos del backend
   useEffect(() => {
+    if (USE_MOCK) return;
     let mounted = true;
     (async () => {
       try {
-        const p: Product[] = USE_MOCK
-          ? (productsMock as Product[])
-          : await apiFetch<Product[]>('/api/products');
-        if (!mounted) return;
-        setProducts(p);
+        const p = await apiFetch<Product[]>('/api/products');
+        if (mounted) LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+        setBackendProducts(p);
       } catch (e: any) {
         if (mounted) setError(e.message || 'No se pudo cargar el catálogo');
       } finally {
-        if (mounted) setCargando(false);
+        if (mounted) setCargandoBackend(false);
       }
     })();
     return () => { mounted = false; };
   }, []);
 
-  if (cargando) {
+  if (loading || cargandoBackend) {
     return (
-      <View style={styles.centrado}>
+      <View style={[styles.centrado, { backgroundColor: colors.background }]}>
         <ActivityIndicator color={COLORES.amarillo} size="large" />
       </View>
     );
   }
+
+  const products = USE_MOCK ? localProducts : backendProducts;
 
   const displayData: Array<Product | { __placeholder: true; id: string }> = [
     ...products,
@@ -61,7 +78,7 @@ export default function HomeScreen() {
   }
 
   return (
-    <View style={styles.contenedor}>
+    <View style={[styles.contenedor, { backgroundColor: colors.background }]}>
       <AppHeader />
 
       {error ? (
@@ -84,13 +101,21 @@ export default function HomeScreen() {
               <ProductCard
                 product={item}
                 onAdd={() =>
-                  tryAdd({ kind: 'product', label: item.name })
+                  tryAdd({
+                    kind: 'product',
+                    label: item.name,
+                    price: item.price,
+                    productId: item.id,
+                  })
                 }
+                onPress={() => router.push(`/editor3d?productId=${item.id}`)}
               />
             );
           }}
           ListEmptyComponent={
-            <Text style={styles.vacio}>Aún no hay productos en el catálogo.</Text>
+            <Text style={[styles.vacio, { color: colors.textMuted }]}>
+              Aún no hay productos en el catálogo.
+            </Text>
           }
         />
       )}

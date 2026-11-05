@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { login as apiLogin, loginDebug } from '../lib/api';
 import {
   ActivityIndicator,
+  Image,
   KeyboardAvoidingView,
   Platform,
   Pressable,
@@ -128,9 +129,11 @@ export default function LoginScreen() {
 
             {/* Cabecera con logo */}
             <View style={styles.cabecera}>
-              <View style={styles.logo}>
-                <Text style={styles.logoTexto}>S</Text>
-              </View>
+              <Image
+                source={require('../../assets/logo/LOGO.png')}
+                style={styles.logoImagen}
+                resizeMode="contain"
+              />
               <View>
                 <Text style={styles.marcaNombre}>Subli-b</Text>
                 <Text style={styles.marcaSub}>Panel de administración</Text>
@@ -267,7 +270,7 @@ export default function LoginScreen() {
             <Text style={styles.pie}>
 
               ¿Aún no tienes cuenta?{' '}
-              <Text style={styles.pieEnlace}>Solicita acceso</Text>
+              <Text style={styles.pieEnlace} onPress={() => router.replace('/register')}>Crear cuenta</Text>
             </Text>
           </View>
         </ScrollView>

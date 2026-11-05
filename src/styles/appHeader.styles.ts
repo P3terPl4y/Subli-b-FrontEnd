@@ -22,21 +22,18 @@ export const styles = StyleSheet.create({
     backgroundColor: COLORES.fondo,
   },
 
-  // Bloque izquierdo: logo + nombre de la app
   marca: { flexDirection: 'row', alignItems: 'center', gap: 10 },
-  logo: {
-    width: 36,
-    height: 36,
-    borderRadius: 9,
-    backgroundColor: COLORES.amarillo,
-    justifyContent: 'center',
-    alignItems: 'center',
+
+  // Imagen del logo (reemplaza el cuadro amarillo con la "S")
+  logoImagen: {
+    width: 38,
+    height: 38,
+    borderRadius: 8,
   },
-  logoTexto: { color: COLORES.fondo, fontSize: 18, fontWeight: '800' },
+
   marcaNombre: { color: COLORES.texto, fontSize: 15, fontWeight: '700' },
   marcaSub: { color: COLORES.suave, fontSize: 10, marginTop: 1 },
 
-  // Bloque derecho: avatar + nombre + boton de salir
   cuenta: {
     flexDirection: 'row',
     alignItems: 'center',

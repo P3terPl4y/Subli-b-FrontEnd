@@ -1,5 +1,4 @@
-import * as SecureStore from 'expo-secure-store';
-import { Platform } from 'react-native';
+import { storage } from './storage';
 
 // Cambia por la IP LAN de tu PC (la misma que muestra Metro: exp://192.168.x.x:8081)
 // y el puerto donde corre tu backend.
@@ -7,21 +6,6 @@ export const API_URL = 'http://192.168.1.112:3000';
 
 const TOKEN_KEY = 'subli_b_token';
 const USER_KEY = 'subli_b_user';
-
-const storage = {
-  async get(key: string): Promise<string | null> {
-    if (Platform.OS === 'web') return localStorage.getItem(key);
-    return SecureStore.getItemAsync(key);
-  },
-  async set(key: string, value: string): Promise<void> {
-    if (Platform.OS === 'web') { localStorage.setItem(key, value); return; }
-    return SecureStore.setItemAsync(key, value);
-  },
-  async remove(key: string): Promise<void> {
-    if (Platform.OS === 'web') { localStorage.removeItem(key); return; }
-    return SecureStore.deleteItemAsync(key);
-  },
-};
 
 export type User = {
   id: string | number;
@@ -97,4 +81,12 @@ export async function loginDebug(): Promise<void> {
       role: 'debug',
     })
   );
+}
+
+// Devuelve true solo si hay sesión y el rol es admin o debug.
+// Se usa para proteger el panel y para mostrar u ocultar el botón.
+export async function isAdmin(): Promise<boolean> {
+  const u = await getUser();
+  if (!u) return false;
+  return u.role === 'admin' || u.role === 'debug';
 }
