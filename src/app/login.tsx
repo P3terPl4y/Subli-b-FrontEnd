@@ -77,7 +77,7 @@ export default function LoginScreen() {
     try {
       await apiLogin(mail, password);
       setMensaje({ tipo: 'exito', texto: 'Acceso concedido. Redirigiendo...' });
-      router.replace('/home');
+      router.replace('/main?tab=home');
     } catch (e: any) {
       setMensaje({ tipo: 'error', texto: e.message || 'No se pudo iniciar sesión' });
       setPassword('');
@@ -90,7 +90,7 @@ export default function LoginScreen() {
   const entrarDebug = async () => {
     try {
       await loginDebug();
-      router.replace('/home');
+      router.replace('/main?tab=home');
     } catch (e: any) {
       setMensaje({ tipo: 'error', texto: e.message });
     }

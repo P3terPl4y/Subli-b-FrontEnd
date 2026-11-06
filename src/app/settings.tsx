@@ -133,7 +133,7 @@ export default function SettingsScreen() {
 
   const salir = async () => {
     await logout();
-    router.replace('/home');
+    router.replace('/main?tab=home');
   };
 
   return (

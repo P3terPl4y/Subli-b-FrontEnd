@@ -1,35 +1,29 @@
 import { Pressable, Text, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { usePathname, useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useCart } from '../context/CartContext';
 import { useTheme } from '../context/ThemeContext';
+import { useTabNavigation, TAB_ORDER, TabName } from '../context/TabNavigationContext';
 import { styles } from '../styles/bottomNav.styles';
 
-type Tab = {
-  path: '/home' | '/carrito' | '/editor3d';
+type TabDef = {
+  key: TabName;
   label: string;
   icon: keyof typeof Ionicons.glyphMap;
   iconActive: keyof typeof Ionicons.glyphMap;
 };
 
-const TABS: Tab[] = [
-  { path: '/home', label: 'Home', icon: 'home-outline', iconActive: 'home' },
-  { path: '/carrito', label: 'Carrito', icon: 'cart-outline', iconActive: 'cart' },
-  { path: '/editor3d', label: 'Editor 3D', icon: 'cube-outline', iconActive: 'cube' },
+const TABS: TabDef[] = [
+  { key: 'home', label: 'Home', icon: 'home-outline', iconActive: 'home' },
+  { key: 'carrito', label: 'Carrito', icon: 'cart-outline', iconActive: 'cart' },
+  { key: 'editor3d', label: 'Editor 3D', icon: 'cube-outline', iconActive: 'cube' },
 ];
 
 export default function BottomNav() {
-  const router = useRouter();
-  const pathname = usePathname();
   const { count } = useCart();
   const { colors, mode } = useTheme();
-  // Espacio reservado por la barra del sistema (gestos o botones)
+  const { activeTab, goToTab } = useTabNavigation();
   const insets = useSafeAreaInsets();
-
-  const go = (path: Tab['path']) => {
-    if (pathname !== path) router.replace(path);
-  };
 
   return (
     <View
@@ -38,10 +32,7 @@ export default function BottomNav() {
         {
           backgroundColor: colors.background,
           borderTopColor: colors.border,
-          // La nav de la app queda por encima de la del telefono:
-          // se respeta la zona segura inferior con un minimo estetico
           paddingBottom: Math.max(insets.bottom, 10),
-          // Sombra superior para separar visualmente del contenido
           shadowColor: '#000',
           shadowOffset: { width: 0, height: -4 },
           shadowOpacity: mode === 'dark' ? 0.5 : 0.12,
@@ -51,11 +42,11 @@ export default function BottomNav() {
       ]}
     >
       {TABS.map((tab) => {
-        const activo = pathname === tab.path;
+        const activo = activeTab === tab.key;
         return (
           <Pressable
-            key={tab.path}
-            onPress={() => go(tab.path)}
+            key={tab.key}
+            onPress={() => goToTab(tab.key)}
             android_ripple={{ color: colors.primary + '33', borderless: true }}
             style={({ pressed }) => [
               styles.item,
@@ -68,7 +59,7 @@ export default function BottomNav() {
                 size={22}
                 color={activo ? colors.primary : colors.textMuted}
               />
-              {tab.path === '/carrito' && count > 0 && (
+              {tab.key === 'carrito' && count > 0 && (
                 <View
                   style={[
                     styles.badge,
@@ -96,8 +87,6 @@ export default function BottomNav() {
             >
               {tab.label}
             </Text>
-
-            {/* Indicador inferior del tab activo */}
             {activo && (
               <View
                 style={{

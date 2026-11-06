@@ -79,13 +79,28 @@ export default function ModelViewer({ modelModule, textureUri }: Props) {
   };
 
   const onContextCreate = async (gl: ExpoWebGLRenderingContext) => {
+    
     const { drawingBufferWidth: width, drawingBufferHeight: height } = gl;
 
     // Renderer de expo-three: crea el canvas correcto en web y en nativo
-    const renderer = new Renderer({ gl }) as unknown as THREE.WebGLRenderer;
-    renderer.setSize(width, height);
-    renderer.setClearColor(0x0b0b0c, 1);
-    rendererRef.current = renderer;
+    // Workaround para expo-gl 58.0.4: three.js r163+ rechaza el contexto
+    // de WebGL2 de expo-gl porque hereda de WebGLRenderingContext. Hacemos
+    // que WebGLRenderingContext sea undefined solo durante la creación
+    // del renderer, para que three.js omita la comprobación de WebGL 1.
+    const g = globalThis as any;
+    const savedWebGL1 = g.WebGLRenderingContext;
+    g.__webgl1Hidden = true;
+    g.WebGLRenderingContext = undefined;
+    let renderer!: THREE.WebGLRenderer;
+    try {
+      renderer = new Renderer({ gl }) as unknown as THREE.WebGLRenderer;
+      renderer.setSize(width, height);
+      renderer.setClearColor(0x0b0b0c, 1);
+      rendererRef.current = renderer;
+    } finally {
+      g.WebGLRenderingContext = savedWebGL1;
+      g.__webgl1Hidden = false;
+    }
 
     const scene = new THREE.Scene();
     sceneRef.current = scene;

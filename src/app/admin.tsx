@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useState, useEffect } from 'react';
 import {
   ActivityIndicator,
   Alert,
@@ -67,7 +67,7 @@ export default function AdminScreen() {
       setUser(u);
       setChecking(false);
       const ok = u?.role === 'admin' || u?.role === 'debug';
-      if (!ok) router.replace('/home');
+      if (!ok) router.replace('/main?tab=home');
     })();
   }, [router]);
 
